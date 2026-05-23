@@ -29,6 +29,7 @@ export class FastSubmitProvider implements vscode.TreeDataProvider<FastSubmit> {
 export class FastSubmit extends vscode.TreeItem {
     constructor(
         public readonly label: string,
+        public readonly courseId: number,
         public readonly assignmentId: number,
         public readonly uri: vscode.Uri,
         public readonly collapsibleState: vscode.TreeItemCollapsibleState
