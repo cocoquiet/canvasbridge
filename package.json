@@ -86,6 +86,10 @@
         {
           "id": "assignment",
           "name": "assignment"
+        },
+        {
+          "id": "fast_submit",
+          "name": "fast_submit"
         }
       ]
     },
