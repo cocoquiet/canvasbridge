@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { Course, CoursesProvider } from './course/course';
 import { Assignment, AssignmentsProvider } from './assignment/assignment';
+import { FastSubmitProvider } from './fast_submit/fast_submit';
 import { displayAssignmentPage } from './assignment/displayAssignmentPage';
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -13,6 +14,11 @@ export async function activate(context: vscode.ExtensionContext) {
 	const assignmentsProvider = new AssignmentsProvider([]);
 	vscode.window.createTreeView('assignment', {
 		treeDataProvider: assignmentsProvider
+	});
+
+	const fastSubmitProvider = new FastSubmitProvider([]);
+	vscode.window.createTreeView('fastSubmit', {
+		treeDataProvider: fastSubmitProvider
 	});
 
 	vscode.commands.registerCommand('course.refreshEntry', async () => {
