@@ -27,7 +27,7 @@ export class AutoSubmitProvider implements vscode.TreeDataProvider<AutoSubmit> {
 
     async addAutoSubmit(assignmentId: number, context: vscode.ExtensionContext): Promise<void> {
         const files = await vscode.window.showOpenDialog({
-            canSelectMany: false,
+            canSelectMany: true,
             openLabel: '자동 제출할 파일 선택',
             filters: {
                 'All Files': ['*']
