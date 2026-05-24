@@ -92,8 +92,8 @@ export class Assignment extends vscode.TreeItem {
         this.iconPath = this.getThemeIcon(workflow_state);
         this.tooltip = this.buildTooltip();
         this.command = {
-            command: 'assignment.displayAssignmentPage',
-            title: 'Display Assignment Page',
+            command: 'assignment.displayAssignmentInfo',
+            title: 'Display Assignment Info',
             arguments: [this],
         };
     }

@@ -24,6 +24,24 @@ export class AutoSubmitProvider implements vscode.TreeDataProvider<AutoSubmit> {
     getChildren(element?: AutoSubmit): Thenable<AutoSubmit[]> {
         return Promise.resolve(this.autoSubmits);
     }
+
+    async addAutoSubmit(assignmentId: number, context: vscode.ExtensionContext): Promise<void> {
+        const files = await vscode.window.showOpenDialog({
+            canSelectMany: false,
+            openLabel: '자동 제출할 파일 선택',
+            filters: {
+                'All Files': ['*']
+            }
+        });
+
+        for (const file of files || []) {
+            const newAutoSubmit = new AutoSubmit(file.fsPath.split('/').pop() || 'Unknown File', file, vscode.TreeItemCollapsibleState.None);
+            const existingAutoSubmits = context.globalState.get<AutoSubmit[]>(`autoSubmits_${assignmentId}`) || [];
+            context.globalState.update(`autoSubmits_${assignmentId}`, [...existingAutoSubmits, newAutoSubmit]);
+        }
+
+        this.refresh(assignmentId, context);
+    }
 }
 
 export class AutoSubmit extends vscode.TreeItem {

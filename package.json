@@ -99,6 +99,11 @@
           "command": "course.refreshEntry",
           "when": "view == course",
           "group": "navigation"
+        },
+        {
+          "command": "assignment.addAutoSubmit",
+          "when": "view == autoSubmit",
+          "group": "navigation"
         }
       ]
     },
@@ -116,12 +121,13 @@
         "title": "list assignment"
       },
       {
-        "command": "autoSubmit.listAutoSubmit",
-        "title": "list auto submit"
+        "command": "assignment.displayAssignmentInfo",
+        "title": "display assignment info"
       },
       {
-        "command": "assignment.displayAssignmentPage",
-        "title": "display assignment page"
+        "command": "assignment.addAutoSubmit",
+        "title": "add auto submit",
+        "icon": "$(new-file)"
       }
     ], 
     "configuration": {

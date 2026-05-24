@@ -29,12 +29,17 @@ export async function activate(context: vscode.ExtensionContext) {
 		assignmentsProvider.refresh(course.courseId);
 	});
 
-	vscode.commands.registerCommand('autoSubmit.listAutoSubmit', async (assignmentId: number) => {
-		await autoSubmitProvider.refresh(assignmentId, context);
+	vscode.commands.registerCommand('assignment.displayAssignmentInfo', async (assignment: Assignment) => {
+		context.globalState.update(`selectedAssignment`, assignment.assignmentId);
+		displayAssignmentPage(assignment, context);
+		await autoSubmitProvider.refresh(assignment.assignmentId, context);
 	});
 
-	vscode.commands.registerCommand('assignment.displayAssignmentPage', async (assignment: Assignment) => {
-		displayAssignmentPage(assignment, context);
+	vscode.commands.registerCommand('assignment.addAutoSubmit', async () => {
+		const selectedAssignmentId = context.globalState.get<number>('selectedAssignment');
+		if (selectedAssignmentId) {
+			await autoSubmitProvider.addAutoSubmit(selectedAssignmentId, context);
+		}
 	});
 }
 
