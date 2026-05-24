@@ -35,6 +35,9 @@ export class AutoSubmitProvider implements vscode.TreeDataProvider<AutoSubmit> {
         });
 
         for (const file of files || []) {
+            if (context.globalState.get<AutoSubmit[]>(`autoSubmits_${assignmentId}`)?.some(submit => submit.fileUri.fsPath === file.fsPath)) {
+                continue;
+            }
             const newAutoSubmit = new AutoSubmit(file.fsPath.split('/').pop() || 'Unknown File', file, vscode.TreeItemCollapsibleState.None);
             const existingAutoSubmits = context.globalState.get<AutoSubmit[]>(`autoSubmits_${assignmentId}`) || [];
             context.globalState.update(`autoSubmits_${assignmentId}`, [...existingAutoSubmits, newAutoSubmit]);
