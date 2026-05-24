@@ -86,6 +86,10 @@
         {
           "id": "assignment",
           "name": "assignment"
+        },
+        {
+          "id": "autoSubmit",
+          "name": "auto submit"
         }
       ]
     },
@@ -110,6 +114,10 @@
       {
         "command": "course.listAssignment",
         "title": "list assignment"
+      },
+      {
+        "command": "autoSubmit.listAutoSubmit",
+        "title": "list auto submit"
       },
       {
         "command": "assignment.displayAssignmentPage",
