@@ -105,6 +105,13 @@
           "when": "view == autoSubmit",
           "group": "navigation"
         }
+      ],
+      "view/item/context": [
+        {
+          "command": "assignment.deleteAutoSubmit",
+          "when": "view == autoSubmit && viewItem == deletable",
+          "group": "inline"
+        }
       ]
     },
     "commands": [
@@ -125,6 +132,11 @@
         "command": "assignment.addAutoSubmit",
         "title": "add auto submit",
         "icon": "$(new-file)"
+      },
+      {
+        "command": "assignment.deleteAutoSubmit",
+        "title": "delete auto submit",
+        "icon": "$(trash)"
       }
     ], 
     "configuration": {

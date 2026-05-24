@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { Course, CoursesProvider } from './course/course';
 import { Assignment, AssignmentsProvider } from './assignment/assignment';
 import { displayAssignmentPage } from './assignment/displayAssignmentPage';
-import { AutoSubmitProvider } from './auto_submit/autoSubmit';
+import { AutoSubmit, AutoSubmitProvider } from './auto_submit/autoSubmit';
 
 export async function activate(context: vscode.ExtensionContext) {
 	const coursesProvider = new CoursesProvider([]);
@@ -40,6 +40,10 @@ export async function activate(context: vscode.ExtensionContext) {
 		if (selectedAssignmentId) {
 			await autoSubmitProvider.addAutoSubmit(selectedAssignmentId, context);
 		}
+	});
+
+	vscode.commands.registerCommand('assignment.deleteAutoSubmit', async (autoSubmit: AutoSubmit) => {
+		await autoSubmitProvider.deleteAutoSubmit(autoSubmit.fileUri, context);
 	});
 }
 
