@@ -111,10 +111,7 @@
       {
         "command": "course.refreshEntry",
         "title": "refresh",
-        "icon": {
-          "light": "resources/light/refresh.svg",
-          "dark": "resources/dark/refresh.svg"
-        }
+        "icon": "$(refresh)"
       },
       {
         "command": "course.listAssignment",
