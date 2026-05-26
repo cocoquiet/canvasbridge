@@ -26,6 +26,10 @@ export async function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('assignment.displayAssignmentPage', async (assignment: Assignment) => {
 		displayAssignmentPage(assignment, context);
 	});
+
+	const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+	statusBarItem.text = 'CanvasBridge';
+	statusBarItem.show();
 }
 
 export function deactivate() {}
