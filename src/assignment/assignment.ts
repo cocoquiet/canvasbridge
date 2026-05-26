@@ -14,38 +14,50 @@ export class AssignmentsProvider implements vscode.TreeDataProvider<Assignment> 
     }
 
     async refresh(courseId: number): Promise<void> {
-        this.assignments = await (async () => {
-            const { token, baseURL } = getProperties();
+        this.assignments = await this.getAssignmentList(courseId);
+        this._onDidChangeTreeData.fire();
+    }
 
-            if (token === '' || baseURL === '') {
+    getTreeItem(element: Assignment): vscode.TreeItem {
+        return element;
+    }
+
+    getChildren(element?: Assignment): Thenable<Assignment[]> {
+        return Promise.resolve(this.assignments);
+    }
+
+    async getAssignmentList(courseId: number): Promise<Assignment[]> {
+        const { token, baseURL } = getProperties();
+
+        if (token === '' || baseURL === '') {
             return Promise.resolve([]);
+        }
+
+        try {
+            const response = await fetch(`${baseURL}/api/v1/courses/${courseId}/assignments`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+            });
+            if (!response.ok) {
+                throw new Error(`Canvas 연결 실패: ${response.status}`);
             }
 
-            try {
-                const response = await fetch(`${baseURL}/api/v1/courses/${courseId}/assignments`, {
+            const data: any = await response.json();
+
+            return await Promise.all(data.map(async (assignment: any) => {
+                const workflowState = await fetch(`${baseURL}/api/v1/courses/${courseId}/assignments/${assignment.id}/submissions/self`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                });
-                if (!response.ok) {
-                    throw new Error(`Canvas 연결 실패: ${response.status}`);
-                }
+                }).then(res => res.json())
+                  .then(submissions => submissions.workflow_state);
 
-                const data: any = await response.json();
-
-                return await Promise.all(data.map(async (assignment: any) => {
-                    const workflowState = await fetch(`${baseURL}/api/v1/courses/${courseId}/assignments/${assignment.id}/submissions/self`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                    }).then(res => res.json())
-                      .then(submissions => submissions.workflow_state);
-
-                    return new Assignment(
+                return new Assignment(
                     assignment.name,
                     workflowState,
                     assignment.id,
@@ -56,22 +68,12 @@ export class AssignmentsProvider implements vscode.TreeDataProvider<Assignment> 
                     assignment.submission_types,
                     assignment.published,
                     vscode.TreeItemCollapsibleState.None
-                    );
-                }));
-            } catch (error: any) {
-                vscode.window.showErrorMessage('Canvas 연결 실패: ' + error.message);
-                return [];
-            }
-        })();
-        this._onDidChangeTreeData.fire();
-    }
-
-    getTreeItem(element: Assignment): vscode.TreeItem {
-        return element;
-    }
-
-    getChildren(element?: Assignment): Thenable<Assignment[]> {
-        return Promise.resolve(this.assignments);
+                );
+            }));
+        } catch (error: any) {
+            vscode.window.showErrorMessage('Canvas 연결 실패: ' + error.message);
+            return [];
+        }
     }
 }
 
