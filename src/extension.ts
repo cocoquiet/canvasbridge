@@ -3,6 +3,8 @@ import { Course, CoursesProvider } from './course/course';
 import { Assignment, AssignmentsProvider } from './assignment/assignment';
 import { displayAssignmentPage } from './assignment/displayAssignmentPage';
 
+let interval: ReturnType<typeof setInterval> | null = null;
+
 export async function activate(context: vscode.ExtensionContext) {
 	const coursesProvider = new CoursesProvider([]);
 	vscode.window.createTreeView('course', {
@@ -46,6 +48,16 @@ export async function activate(context: vscode.ExtensionContext) {
 	statusBarItem.command = 'canvasbridge.checkall';
 	vscode.commands.executeCommand('canvasbridge.checkall');
 	statusBarItem.show();
+
+	const intervalCheckAll = async () => {
+		vscode.commands.executeCommand('canvasbridge.checkall');
+	};
+
+	interval = setInterval(intervalCheckAll, 10 * 1000);
 }
 
-export function deactivate() {}
+export function deactivate() {
+	if (interval) {
+		clearInterval(interval);
+	}
+}
