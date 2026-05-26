@@ -53,7 +53,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.commands.executeCommand('canvasbridge.checkall');
 	};
 
-	interval = setInterval(intervalCheckAll, 10 * 1000);
+	interval = setInterval(intervalCheckAll, 60 * 1000);
 }
 
 export function deactivate() {
