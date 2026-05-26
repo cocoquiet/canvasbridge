@@ -14,41 +14,8 @@ export class CoursesProvider implements vscode.TreeDataProvider<Course> {
         this.courses = courses;
     }
 
-    async refresh(): Promise<void> {
-        this.courses = await (async () => {
-            const { token, baseURL } = getProperties();
-
-            if (token === '' || baseURL === '') {
-                return Promise.resolve([]);
-            }
-
-            try {
-                const response = await fetch(`${baseURL}/api/v1/courses?enrollment_state=active`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                });
-                if (!response.ok) {
-                    throw new Error(`Canvas 연결 실패: ${response.status}`);
-                }
-
-                const data: any = await response.json();
-
-                return Promise.all(data.map((course: any) => {
-                    return new Course(
-                        course.name,
-                        course.id,
-                        course.calendar ? course.calendar : '',
-                        vscode.TreeItemCollapsibleState.None
-                    );
-                }));
-            } catch (error: any) {
-                vscode.window.showErrorMessage('Canvas 연결 실패: ' + error.message);
-                return [];
-            }
-        })();
+    async refresh(courses: Course[]): Promise<void> {
+        this.courses = courses;
         this._onDidChangeTreeData.fire();
     }
 
@@ -58,6 +25,46 @@ export class CoursesProvider implements vscode.TreeDataProvider<Course> {
 
     getChildren(element?: Course): Thenable<Course[]> {
         return Promise.resolve(this.courses);
+    }
+
+    async getCourseList(): Promise<Course[]> {
+        const { token, baseURL } = getProperties();
+
+        if (token === '' || baseURL === '') {
+            return Promise.resolve([]);
+        }
+
+        try {
+            const response = await fetch(
+                `${baseURL}/api/v1/courses?enrollment_state=active`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                },
+            );
+            if (!response.ok) {
+                throw new Error(`Canvas 연결 실패: ${response.status}`);
+            }
+
+            const data: any = await response.json();
+
+            return Promise.all(
+                data.map((course: any) => {
+                    return new Course(
+                        course.name,
+                        course.id,
+                        course.calendar ? course.calendar : "",
+                        vscode.TreeItemCollapsibleState.None,
+                    );
+                }),
+            );
+        } catch (error: any) {
+            vscode.window.showErrorMessage("Canvas 연결 실패: " + error.message);
+            return [];
+        }
     }
 }
 
