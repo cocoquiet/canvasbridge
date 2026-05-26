@@ -8,7 +8,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	vscode.window.createTreeView('course', {
 		treeDataProvider: coursesProvider
 	});
-	coursesProvider.refresh();
+	coursesProvider.refresh(await coursesProvider.getCourseList());
 
 	const assignmentsProvider = new AssignmentsProvider([]);
 	vscode.window.createTreeView('assignment', {
@@ -16,7 +16,8 @@ export async function activate(context: vscode.ExtensionContext) {
 	});
 
 	vscode.commands.registerCommand('course.refreshEntry', async () => {
-		coursesProvider.refresh();
+		const courses = await coursesProvider.getCourseList();
+		coursesProvider.refresh(courses);
 	});
 
 	vscode.commands.registerCommand('course.listAssignment', async (course: Course) => {
@@ -27,8 +28,23 @@ export async function activate(context: vscode.ExtensionContext) {
 		displayAssignmentPage(assignment, context);
 	});
 
+	vscode.commands.registerCommand('canvasbridge.checkall', async () => {
+		statusBarItem.text = `CanvasBridge: Checking for unsubmitted assignments...`;
+		let unsubmittedAssignments = [];
+
+		const courses = await coursesProvider.getCourseList();
+		coursesProvider.refresh(courses);
+		for (const course of courses) {
+			const assignments = await assignmentsProvider.getAssignmentList(course.courseId);
+			unsubmittedAssignments.push(...assignments.filter(assignment => assignment.workflow_state == 'unsubmitted'));
+		}
+
+		statusBarItem.text = `CanvasBridge: ${unsubmittedAssignments.length} Unsubmitted Assignments`;
+	});
+
 	const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-	statusBarItem.text = 'CanvasBridge';
+	statusBarItem.command = 'canvasbridge.checkall';
+	vscode.commands.executeCommand('canvasbridge.checkall');
 	statusBarItem.show();
 }
 
