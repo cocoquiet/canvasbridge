@@ -3,7 +3,34 @@ import { Assignment } from './assignment';
 import { uploadSubmissionFile } from './uploadSubmissionFile';
 import { submitAssignment } from './submitAssignment';
 
-export async function displayAssignmentPage(assignment: Assignment, context: vscode.ExtensionContext) {
+type AssignmentPayload = {
+    label: string;
+    workflow_state: string;
+    assignmentId: number;
+    courseId: number;
+    html: string;
+    dueAt: string;
+    pointsPossible: number;
+    submissionTypes: string[];
+    published: boolean;
+};
+
+export async function displayAssignmentPage(assignmentInput: Assignment | AssignmentPayload, context: vscode.ExtensionContext) {
+    const assignment = assignmentInput instanceof Assignment
+        ? assignmentInput
+        : new Assignment(
+            assignmentInput.label,
+            assignmentInput.workflow_state,
+            assignmentInput.assignmentId,
+            assignmentInput.courseId,
+            assignmentInput.html,
+            assignmentInput.dueAt,
+            assignmentInput.pointsPossible,
+            assignmentInput.submissionTypes,
+            assignmentInput.published,
+            vscode.TreeItemCollapsibleState.None,
+        );
+
     const configuredTheme = vscode.workspace.getConfiguration('canvasbridge').get<string>('assignmentPageTheme') || 'light';
     const theme = configuredTheme === 'dark' ? 'dark' : 'light';
     const resourceRoot = vscode.Uri.joinPath(context.extensionUri, 'resources');
