@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { Course, CoursesProvider } from './course/course';
 import { Assignment, AssignmentsProvider } from './assignment/assignment';
 import { displayAssignmentPage } from './assignment/displayAssignmentPage';
+import { checkAll } from './checkAll';
 
 let interval: ReturnType<typeof setInterval> | null = null;
 
@@ -31,28 +32,17 @@ export async function activate(context: vscode.ExtensionContext) {
 	});
 
 	vscode.commands.registerCommand('canvasbridge.checkall', async () => {
-		statusBarItem.text = `CanvasBridge: Checking for unsubmitted assignments...`;
-		let unsubmittedAssignments = [];
-
-		const courses = await coursesProvider.getCourseList();
-		coursesProvider.refresh(courses);
-		for (const course of courses) {
-			const assignments = await assignmentsProvider.getAssignmentList(course.courseId);
-			unsubmittedAssignments.push(...assignments.filter(assignment => assignment.workflow_state == 'unsubmitted'));
-		}
-
-		statusBarItem.text = `CanvasBridge: ${unsubmittedAssignments.length} Unsubmitted Assignments`;
+		checkAll(statusBarItem, coursesProvider, assignmentsProvider);
 	});
 
 	const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
 	statusBarItem.command = 'canvasbridge.checkall';
-	vscode.commands.executeCommand('canvasbridge.checkall');
 	statusBarItem.show();
-
+	
+	vscode.commands.executeCommand('canvasbridge.checkall');
 	const intervalCheckAll = async () => {
 		vscode.commands.executeCommand('canvasbridge.checkall');
 	};
-
 	interval = setInterval(intervalCheckAll, 60 * 1000);
 }
 
